@@ -177,14 +177,14 @@ int main(int argc, char *argv[])
 
     Sphere spheres[MAX_SPHERES] = {
         sphere_create(vec3_create(0.0f, 0.0f, 0.0f), vec3_create(0.0f, 0.0f, 0.0f), 6.95f, "assets/sun.jpg"),       // sun
-        sphere_create(vec3_create(10.0f, 0.0f, 0.0f), vec3_create(0.0f, 0.0f, 0.0f), 0.124f, "assets/mercury.jpg"), // mercury
-        sphere_create(vec3_create(15.0f, 0.0f, 0.0f), vec3_create(0.0f, 0.0f, 0.0f), 0.161f, "assets/venus.jpg"),   // venus
-        sphere_create(vec3_create(20.0f, 0.0f, 0.0f), vec3_create(0.0f, 0.0f, 0.0f), 0.164f, "assets/earth.jpg"),   // earth
-        sphere_create(vec3_create(25.0f, 0.0f, 0.0f), vec3_create(0.0f, 0.0f, 0.0f), 0.134f, "assets/mars.jpg"),    // mars
-        sphere_create(vec3_create(30.0f, 0.0f, 0.0f), vec3_create(0.0f, 0.0f, 0.0f), 0.71f, "assets/jupiter.jpg"),  // jupiter
-        sphere_create(vec3_create(35.0f, 0.0f, 0.0f), vec3_create(0.0f, 0.0f, 0.0f), 0.60f, "assets/saturn.jpg"),   // saturn
-        sphere_create(vec3_create(40.0f, 0.0f, 0.0f), vec3_create(0.0f, 0.0f, 0.0f), 0.25f, "assets/uranus.jpg"),   // uranus
-        sphere_create(vec3_create(45.0f, 0.0f, 0.0f), vec3_create(0.0f, 0.0f, 0.0f), 0.25f, "assets/neptune.jpg")}; // neptune
+        sphere_create(vec3_create(15.0f, 0.0f, 0.0f), vec3_create(0.0f, 0.0f, 0.0f), 0.124f, "assets/mercury.jpg"), // mercury
+        sphere_create(vec3_create(20.0f, 0.0f, 0.0f), vec3_create(0.0f, 0.0f, 0.0f), 0.161f, "assets/venus.jpg"),   // venus
+        sphere_create(vec3_create(25.0f, 0.0f, 0.0f), vec3_create(0.0f, 0.0f, 0.0f), 0.164f, "assets/earth.jpg"),   // earth
+        sphere_create(vec3_create(30.0f, 0.0f, 0.0f), vec3_create(0.0f, 0.0f, 0.0f), 0.134f, "assets/mars.jpg"),    // mars
+        sphere_create(vec3_create(35.0f, 0.0f, 0.0f), vec3_create(0.0f, 0.0f, 0.0f), 0.71f, "assets/jupiter.jpg"),  // jupiter
+        sphere_create(vec3_create(40.0f, 0.0f, 0.0f), vec3_create(0.0f, 0.0f, 0.0f), 0.60f, "assets/saturn.jpg"),   // saturn
+        sphere_create(vec3_create(45.0f, 0.0f, 0.0f), vec3_create(0.0f, 0.0f, 0.0f), 0.25f, "assets/uranus.jpg"),   // uranus
+        sphere_create(vec3_create(50.0f, 0.0f, 0.0f), vec3_create(0.0f, 0.0f, 0.0f), 0.25f, "assets/neptune.jpg")}; // neptune
     // Sphere spheres[MAX_SPHERES] = {
     //     sphere_create(vec3_create(0.0f, 0.0f, 0.0f), vec3_create(0.0f, 0.0f, 0.0f), 6.95f, "assets/sun.jpg"),       // sun
     //     sphere_create(vec3_create(10.0f, 0.0f, 0.0f), vec3_create(0.0f, 0.0f, 0.0f), 0.024f, "assets/mercury.jpg"), // mercury
@@ -196,8 +196,10 @@ int main(int argc, char *argv[])
     //     sphere_create(vec3_create(40.0f, 0.0f, 0.0f), vec3_create(0.0f, 0.0f, 0.0f), 0.25f, "assets/uranus.jpg"),   // uranus
     //     sphere_create(vec3_create(45.0f, 0.0f, 0.0f), vec3_create(0.0f, 0.0f, 0.0f), 0.25f, "assets/neptune.jpg")}; // neptune
 
-    float sphere_thetas[MAX_SPHERES] = {
+    float sphere_year_thetas[MAX_SPHERES] = {
         0.0f, .0026, .001, .00063, .00033, .000053, .0000213, .0000075, .00000381};
+    float sphere_day_thetas[MAX_SPHERES] = {
+        0.0f, 0.000642f, 0.00016f, 0.038f, 0.038f, 0.0898f, 0.0857f, 0.0524f, 0.0563f};
 
     printf("Loading shaders\n");
     unsigned int shader = create_shader_program(read_file("src/shaders/cube.vert"), read_file("src/shaders/cube.frag"));
@@ -331,7 +333,7 @@ int main(int argc, char *argv[])
         projection = mat4_perspective(fov_radians, aspect, 0.1f, 100.0f);
         view = mat4_look_at(camera_position, target, vec3_create(0, 1, 0));
 
-        glClearColor(0.1f, 0.1f, 0.12f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // need depth buffer bc 3d
 
         // glUseProgram(shader);
@@ -367,10 +369,12 @@ int main(int argc, char *argv[])
         {
             float sphere_coord_x = spheres[j].position.x;
             float sphere_coord_z = spheres[j].position.z;
-            float theta = sphere_thetas[j];
-            spheres[j].position.x = sphere_coord_x * cosf(theta) - sphere_coord_z * sinf(theta);
-            spheres[j].position.z = sphere_coord_x * sinf(theta) + sphere_coord_z * cosf(theta);
-            spheres[j].rotation.y += 0.5f * delta_time;
+            float yearly_rotation = sphere_year_thetas[j];
+            float daily_rotation = sphere_day_thetas[j];
+
+            spheres[j].position.x = sphere_coord_x * cosf(yearly_rotation) - sphere_coord_z * sinf(yearly_rotation);
+            spheres[j].position.z = sphere_coord_x * sinf(yearly_rotation) + sphere_coord_z * cosf(yearly_rotation);
+            spheres[j].rotation.y += daily_rotation;
 
             sphere_draw(&sphere_mesh, &spheres[j], loc_model);
         }
